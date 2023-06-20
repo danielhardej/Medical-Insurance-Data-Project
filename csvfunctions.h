@@ -4,8 +4,11 @@
 #include <string>
 #include <vector>
 
-std::string openCsvFile();
-std::vector<std::vector<std::string> > readCsvFile(const std::string& filePath);
-std::vector<std::string> getColumnNames(const std::string& filePath);
+using namespace std;
+
+string openCsvFile();
+vector<vector<string> > readCsvFile(const string& filePath);
+vector<string> getColumnNames(const string& filePath);
+vector<double> getColumn(const string& columnName);
 
 #endif // CSVFUNCTIONS_H

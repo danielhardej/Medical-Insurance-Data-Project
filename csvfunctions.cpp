@@ -2,17 +2,17 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream> 
 
-#include <string>
-#include <iostream>
+using namespace std;
 
-std::string openCsvFile() {
+string openCsvFile() {
     // Prompt the user to select a CSV file
-    std::cout << "Enter the path to the CSV file: ";
+    cout << "Enter the path to the CSV file: ";
 
     // Read the file path from the console
-    std::string filePath;
-    std::getline(std::cin, filePath);
+    string filePath;
+    getline(cin, filePath);
 
     // set a default file path if no file path is provided
     if (filePath.empty()) {
@@ -23,32 +23,31 @@ std::string openCsvFile() {
     return filePath;
 }
 
-std::vector<std::vector<std::string> > readCsvFile(const std::string& filePath) {
+vector<vector<string> > readCsvFile(const string& filePath) {
     // Open the CSV file for reading
-    std::ifstream file(filePath);
+    ifstream file(filePath);
 
     // Read the contents of the CSV file line by line
-    std::string line;
-    std::vector<std::vector<std::string> > data;
-    while (std::getline(file, line)) {
-        // Split the line into fields using a comma as the delimiter
-        std::vector<std::string> fields;
-        std::string field;
-        for (size_t i = 0; i < line.size(); i++) {
-            char c = line[i];
-            if (c == ',') {
-                fields.push_back(field);
-                field.clear();
-            } else {
-                field += c;
-            }
-        }
-        fields.push_back(field);
+    vector<vector<string> > data;
+    string line;
+    while (getline(file, line)) {
+        // Create a vector of strings representing the fields in the line
+        vector<string> fields;
 
-        // Add the fields to the data vector
+        // Create a stringstream from the line
+        stringstream ss(line);
+
+        // Create a string variable to store each field in the line
+        string field;
+
+        // Use getline to extract each field
+        while (getline(ss, field, ',')) {
+            // Add the field to the vector of fields
+            fields.push_back(field);
+        }
+
+        // Add the vector of fields to the vector of data
         data.push_back(fields);
-        //print the line of data
-        // std::cout << line << std::endl;
     }
 
     // Close the file
@@ -58,17 +57,17 @@ std::vector<std::vector<std::string> > readCsvFile(const std::string& filePath) 
     return data;
 }
 
-std::vector<std::string> getColumnNames(const std::string& filePath) {
+vector<string> getColumnNames(const string& filePath) {
     // Open the CSV file for reading
-    std::ifstream file(filePath);
+    ifstream file(filePath);
 
     // Read the first line of the CSV file
-    std::string line;
-    std::getline(file, line);
+    string line;
+    getline(file, line);
 
     // Split the line into fields using a comma as the delimiter
-    std::vector<std::string> columnNames;
-    std::string field;
+    vector<string> columnNames;
+    string field;
     for (size_t i = 0; i < line.size(); i++) {
         char c = line[i];
         if (c == ',') {
@@ -87,33 +86,55 @@ std::vector<std::string> getColumnNames(const std::string& filePath) {
     return columnNames;
 }
 
-std::vector<double> getColumn(const std::string columnName) {
+vector<double> getColumn(const string& columnName) {
     // Prompt the user to select a CSV file
-    std::string filePath = openCsvFile();
+    string filePath = openCsvFile();
 
     // Read the contents of the CSV file
-    std::vector<std::vector<std::string> > data = readCsvFile(filePath);
+    vector<vector<string> > data = readCsvFile(filePath);
 
     // Get the column names from the first row of the data
-    std::vector<std::string> columnNames = data[0];
+    vector<string> columnNames = getColumnNames(filePath);
 
     // Find the index corresponding to the column name
-    int columnIndex = -1;
-    for (size_t i = 0; i < columnNames.size(); i++) {
+    int index = 0;
+    for (size_t i = 0; i <= columnNames.size(); i++) {
         if (columnNames[i] == columnName) {
-            columnIndex = i;
+            index = i;
             break;
         }
     }
 
-    // Extract the column data from the data vector
-    std::vector<double> columnData;
-    for (size_t i = 1; i < data.size(); i++) {
-        std::vector<std::string> row = data[i];
-        std::string cell = row[columnIndex];
-        double cellValue = std::stod(cell);
-        columnData.push_back(cellValue);
+    // Create a vector of doubles representing the column data
+    vector<double> columnData;
+
+    // check if column data is numeric or not
+    bool isNumeric = true;
+    for (size_t i = 0; i < data.size(); i++) {
+        vector<string> row = data[i];
+        string value = row[index];
+        for (size_t j = 0; j < value.size(); j++) {
+            char c = value[j];
+            if (!isdigit(c) && c != '.') {
+                isNumeric = false;
+                break;
+            }
+        }
     }
+
+    if (isNumeric) {
+
+        // Add the data in the column to the vector of doubles
+        for (size_t i = 0; i < data.size(); i++) {
+            vector<string> row = data[i];
+            string value = row[index];
+            columnData.push_back(stod(value));
+        }
+
+    } else
+
+    
+    
 
     // Return the column data vector
     return columnData;
