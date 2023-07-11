@@ -24,6 +24,7 @@ double some_function(vector<double> vec) {
     return last_elment_vector; // returns desired value
 }
 
+
 int main() {
     cout << "Hello World!\n";
     // prompt the user for a string input
